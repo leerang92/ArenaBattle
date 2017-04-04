@@ -13,8 +13,8 @@ AABWeapon::AABWeapon()
 	Weapon = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("WeaponSkeletalMesh"));
 	RootComponent = Weapon;
 
-	ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_Weapon (
-		TEXT("SkeletalMesh'/Game/InfinityBladeWeapons/Weapons/Blade/Swords/Blade_BlackWyrmBlade/SK_Blade_BlackWyrmBlade.SK_Blade_BlackWyrmBlade'"));
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_Weapon 
+	(TEXT("SkeletalMesh'/Game/InfinityBladeWeapons/Weapons/Blade/Swords/Blade_BlackWyrmBlade/SK_Blade_BlackWyrmBlade.SK_Blade_BlackWyrmBlade'"));
 	Weapon->SetSkeletalMesh(SK_Weapon.Object);
 }
 
@@ -30,5 +30,10 @@ void AABWeapon::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
 
+}
+
+float AABWeapon::GetDamage()
+{
+	return BaseDamage;
 }
 
