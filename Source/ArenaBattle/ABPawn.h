@@ -5,7 +5,7 @@
 #include "GameFramework/Pawn.h"
 #include "ABPawn.generated.h"
 
-UCLASS()
+UCLASS(config=Game)
 class ARENABATTLE_API AABPawn : public APawn
 {
 	GENERATED_BODY()
@@ -34,4 +34,14 @@ public:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
 	class UCameraComponent* Camera;
+
+	// Config 폴더의 ini 파일에서 초기화 시킬 변수
+	UPROPERTY(config, EditAnywhere, BlueprintReadWrite, Category = "Stat")
+	float MaxHP;
+	UPROPERTY(EditInstanceOnly, BlueprintReadWrite, Category = "Stat")
+	float CurrentHP;
+
+public:
+	UPROPERTY(config, VisibleInstanceOnly, BlueprintReadOnly, Category = "Asset")
+	TArray<FStringAssetReference> CharacterAssets;
 };
