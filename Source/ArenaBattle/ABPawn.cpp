@@ -2,6 +2,7 @@
 
 #include "ArenaBattle.h"
 #include "ABGameInstance.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "ABPawn.h"
 
 
@@ -29,11 +30,23 @@ AABPawn::AABPawn()
 	Mesh->SetupAttachment(Body); // Capsule Collider의 하위(자식) 객체로 설정
 
 	Movement = CreateDefaultSubobject<UFloatingPawnMovement>(TEXT("Movement"));
+	Movement->MaxSpeed = 600.0f;
+
+	// 스프링 암 설정
+	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("Spring Arm"));
+	SpringArm->SetupAttachment(Body);
+	SpringArm->SetRelativeRotation(FRotator(-35.0f, 0, 0));
+	SpringArm->TargetArmLength = 500.0f;
+	SpringArm->bInheritPitch = false;
+	SpringArm->bInheritYaw = false;
+	SpringArm->bInheritRoll = false;
+
 
 	// 카메라 설정
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
-	Camera->SetRelativeLocationAndRotation(FVector(-200.0f, 0, 160.0f), FRotator(-20.0f, 0, 0));
-	Camera->SetupAttachment(Body);
+	//Camera->SetRelativeLocationAndRotation(FVector(-200.0f, 0, 160.0f), FRotator(-20.0f, 0, 0));
+	Camera->SetupAttachment(SpringArm);
+
 }
 
 // Called when the game starts or when spawned
@@ -58,6 +71,15 @@ void AABPawn::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
 
+
+	FVector InputVector = FVector(CurrentUpDownVal, CurrentLeftRightVal, 0.0F);
+	if (InputVector.SizeSquared() > 0.0F)
+	{
+		FRotator TargetRotation = UKismetMathLibrary::MakeRotFromX(InputVector);
+		SetActorRotation(TargetRotation);
+		AddMovementInput(GetActorForwardVector());
+	}
+
 }
 
 // Called to bind functionality to input
@@ -65,5 +87,17 @@ void AABPawn::SetupPlayerInputComponent(class UInputComponent* InputComponent)
 {
 	Super::SetupPlayerInputComponent(InputComponent);
 
+	InputComponent->BindAxis("LeftRight", this, &AABPawn::LeftRightInput);
+	InputComponent->BindAxis("UpDown", this, &AABPawn::UpDownInput);
+}
+
+void AABPawn::UpDownInput(float NewInputVal)
+{
+	CurrentUpDownVal = NewInputVal;
+}
+
+void AABPawn::LeftRightInput(float NewInputVal)
+{
+	CurrentLeftRightVal = NewInputVal;
 }
 
