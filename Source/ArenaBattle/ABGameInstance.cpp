@@ -30,11 +30,63 @@ void UABGameInstance::Init()
 	AB_LOG_CALLONLY(Warning);
 	Super::Init();
 
-	FHouse* HouseNew = new FHouse();
-	WebConnect->TokenCompleteDelegate.AddUObject(this, &UABGameInstance::RequestTokenComplete);
-	WebConnect->TokenCompleteDelegate.AddUObject(this, &UABGameInstance::RequestTokenComplete2);
-	WebConnect->TokenCompleteDelegate.AddRaw(HouseNew, &FHouse::RequestTokenComplete);
-	WebConnect->RequestToken(TEXT("destiny"));
+	FString PackageName = TEXT("/Temp/SavedWebConnection");
+	UPackage* NewPackage = CreatePackage(nullptr, *PackageName);
+	WebConnectionNew = NewObject<UWebConnect>(NewPackage);
+	FString PackageFileName = FPackageName::LongPackageNameToFilename(PackageName, FPackageName::GetAssetPackageExtension());
+
+	WebConnectionNew->Host = TEXT("127.0.0.7");
+	WebConnectionNew->URI = TEXT("/");
+	if (UPackage::SavePackage(NewPackage, WebConnectionNew, RF_Standalone, *PackageFileName))
+	{
+		UPackage* SavedPackage = ::LoadPackage(NULL, *PackageFileName, LOAD_None);
+		TArray<UObject *> ObjectsInPackage;
+		GetObjectsWithOuter(SavedPackage, ObjectsInPackage, false);
+		for (const auto& EachObject : ObjectsInPackage)
+		{
+			UWebConnect* WebConnectionFromFile = Cast<UWebConnect>(EachObject);
+			if (WebConnectionFromFile)
+			{
+				AB_LOG(Warning, TEXT("WebConnection From File : Host %s , URI %s"), *WebConnectionFromFile->Host, *WebConnectionFromFile->URI);
+			}
+		}
+	}
+
+	//WebConnectionNew = NewObject<UWebConnect>(this);
+	//WebConnectionNew->Host = TEXT("127.0.0.7");
+	//WebConnectionNew->URI = TEXT("/");
+
+	//FString FullPath = FString::Printf(TEXT("%s%s"), *FPaths::GameSavedDir(), TEXT("WebConnection.txt"));
+	//FArchive* ArWriter = IFileManager::Get().CreateFileWriter(*FullPath);
+	//if (ArWriter)
+	//{
+	//	/**ArWriter << WebConnectionNew->Host;
+	//	*ArWriter << WebConnectionNew->URI;*/
+	//	*ArWriter << *WebConnectionNew;
+	//	ArWriter->Close();
+	//	delete ArWriter;
+	//	ArWriter = NULL;
+	//}
+
+	//TSharedPtr<FArchive> FileReader = MakeShareable(IFileManager::Get().CreateFileReader(*FullPath));
+	//if (FileReader.IsValid())
+	//{
+	//	//FString Host;
+	//	//FString URI;
+	//	//*FileReader.Get() << Host;
+	//	//*FileReader.Get() << URI;
+	//	UWebConnect* WebConnectionFromFile = NewObject<UWebConnect>(this);
+	//	*FileReader.Get() << *WebConnectionFromFile;
+	//	FileReader->Close();
+	//	AB_LOG(Warning, TEXT("WebConnection From File : Host %s , URI %s"), *WebConnectionFromFile->Host, *WebConnectionFromFile->URI);
+	//	//AB_LOG(Warning, TEXT("WebConnection : Host %s , URI %s"), *Host, *URI);
+	//}
+
+	//FHouse* HouseNew = new FHouse();
+	//WebConnect->TokenCompleteDelegate.AddDynamic(this, &UABGameInstance::RequestTokenComplete);
+	//WebConnect->TokenCompleteDelegate.AddDynamic(this, &UABGameInstance::RequestTokenComplete2);
+	//WebConnect->TokenCompleteDelegate.AddRaw(HouseNew, &FHouse::RequestTokenComplete);
+	//WebConnect->RequestToken(TEXT("destiny"));
 
 	///* 
 	//* NewObject는 CreateDefaultSubobject와 달리 CDO를 생성하지 않음.

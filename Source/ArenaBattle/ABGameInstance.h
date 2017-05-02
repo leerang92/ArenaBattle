@@ -27,17 +27,19 @@ UCLASS()
 class ARENABATTLE_API UABGameInstance : public UGameInstance
 {
 	GENERATED_BODY()
-	
 public:
 	UABGameInstance();
 
 	virtual void Init() override;
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "WebService")
 	class UWebConnect* WebConnect;
 
 	//UPROPERTY()
 	class UWebConnect* WebConnect2;
+
+	UPROPERTY()
+	class UWebConnect* WebConnectionNew;
 
 	UPROPERTY()
 	FStreamableManager AssetLoader;
@@ -52,5 +54,4 @@ public:
 
 	UFUNCTION()
 	void RequestTokenComplete2(const FString& Token);
-	
 };
