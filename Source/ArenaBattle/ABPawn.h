@@ -5,6 +5,13 @@
 #include "GameFramework/Pawn.h"
 #include "ABPawn.generated.h"
 
+UENUM(BlueprintType)
+enum class EPlayerState : uint8
+{
+	PEACE,
+	BATTLE,
+};
+
 UCLASS(config=Game)
 class ARENABATTLE_API AABPawn : public APawn
 {
@@ -47,6 +54,8 @@ public:
 	UPROPERTY(config, VisibleInstanceOnly, BlueprintReadOnly, Category = "Asset")
 	TArray<FStringAssetReference> CharacterAssets;
 
+	EPlayerState CurrentState;
+
 private:
 
 	float CurrentLeftRightVal;
@@ -57,4 +66,10 @@ private:
 
 	UFUNCTION()
 	void LeftRightInput(float NewInputVal);
+
+	UFUNCTION()
+	void OnPressNormalAttack();
+
+	UFUNCTION()
+		void OffPressNormalAttack();
 };

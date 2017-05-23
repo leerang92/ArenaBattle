@@ -47,6 +47,7 @@ AABPawn::AABPawn()
 	//Camera->SetRelativeLocationAndRotation(FVector(-200.0f, 0, 160.0f), FRotator(-20.0f, 0, 0));
 	Camera->SetupAttachment(SpringArm);
 
+	CurrentState = EPlayerState::PEACE;
 }
 
 // Called when the game starts or when spawned
@@ -73,12 +74,22 @@ void AABPawn::Tick( float DeltaTime )
 
 
 	FVector InputVector = FVector(CurrentUpDownVal, CurrentLeftRightVal, 0.0F);
-	if (InputVector.SizeSquared() > 0.0F)
+
+	switch (CurrentState)
 	{
-		FRotator TargetRotation = UKismetMathLibrary::MakeRotFromX(InputVector);
-		SetActorRotation(TargetRotation);
-		AddMovementInput(GetActorForwardVector());
+	case EPlayerState::PEACE:
+	{
+		if (InputVector.SizeSquared() > 0.0F)
+		{
+			FRotator TargetRotation = UKismetMathLibrary::MakeRotFromX(InputVector);
+			SetActorRotation(TargetRotation);
+			AddMovementInput(GetActorForwardVector());
+		}
+		break;
 	}
+	case EPlayerState::BATTLE:
+		break;
+	}	
 
 }
 
@@ -89,6 +100,9 @@ void AABPawn::SetupPlayerInputComponent(class UInputComponent* InputComponent)
 
 	InputComponent->BindAxis("LeftRight", this, &AABPawn::LeftRightInput);
 	InputComponent->BindAxis("UpDown", this, &AABPawn::UpDownInput);
+
+	InputComponent->BindAction("NormalAttack", IE_Pressed, this, &AABPawn::OnPressNormalAttack);
+	//InputComponent->BindAction("NormalAttack", IE_Released, this, &AABPawn::OffPressNormalAttack);
 }
 
 void AABPawn::UpDownInput(float NewInputVal)
@@ -99,5 +113,15 @@ void AABPawn::UpDownInput(float NewInputVal)
 void AABPawn::LeftRightInput(float NewInputVal)
 {
 	CurrentLeftRightVal = NewInputVal;
+}
+
+void AABPawn::OnPressNormalAttack()
+{
+	CurrentState = EPlayerState::BATTLE;
+}
+
+void AABPawn::OffPressNormalAttack()
+{
+	CurrentState = EPlayerState::PEACE;
 }
 
