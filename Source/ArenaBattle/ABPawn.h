@@ -56,6 +56,8 @@ public:
 
 	EPlayerState CurrentState;
 
+	void OnNormalAttackEnd();
+
 private:
 
 	float CurrentLeftRightVal;
@@ -69,7 +71,4 @@ private:
 
 	UFUNCTION()
 	void OnPressNormalAttack();
-
-	UFUNCTION()
-		void OffPressNormalAttack();
 };

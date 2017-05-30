@@ -22,11 +22,26 @@ public:
 
 	UFUNCTION()
 	void AnimNotify_AttackEnd(UAnimNotify* Notify);
+	
+	UFUNCTION()
+	void AnimNotify_NextAttack(UAnimNotify* Notify);
 
 	UPROPERTY(EditDefaultsOnly , BlueprintReadOnly, Category = "Pawn")
 	float VelocityAnim;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	EPlayerState CurrentStateAnim;
+
+	void ReceiveNormalAttackInput();
+	void PlayNormalAttack(int32 NewIndex);
+
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Montage")
+	class UAnimMontage* NormalAttackMontage;
+
+	int32 CurrentNormalAttackIndex;
+	int32 MaxNormalAttackIndex;
+	int32 bCanDoNextAttack : 1;
+	int32 bInputReservedForNextAttack : 1;
 	
 };
